@@ -2,8 +2,7 @@
 const STORAGE_KEY = "feedback-form-state";
 
 const form = document.querySelector(".feedback-form");
-const email = form.querySelector('input[name="email"]');
-const textarea = form.querySelector("textarea");
+
 
 
 let formData = {
@@ -14,34 +13,36 @@ let formData = {
 
 fillForm();
 
-email.addEventListener("input", onEmailInput);
-textarea.addEventListener("input", onTextareaInput);
 
+form.addEventListener("input", onFeedbeckInput);
 
-function onEmailInput(event) {
-  formData.email = event.target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-}
-
-function onTextareaInput(event) {
-  formData.message = event.target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-}
-
-function fillForm() {
-  const savedData = localStorage.getItem(STORAGE_KEY);
-  if (!savedData) return;
-
-  const parsedData = JSON.parse(savedData);
-  formData = parsedData;
-
-  if (parsedData.email) {
-    email.value = parsedData.email;
+function onFeedbeckInput(event) {
+    const fieldName = event.target.name;       
+    const fieldValue = event.target.value;
+  
+    formData[fieldName] = fieldValue.trim();   
+  
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
   }
-  if (parsedData.message) {
-    textarea.value = parsedData.message;
+
+
+
+  function fillForm() {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (!savedData) return;
+  
+    const parsedData = JSON.parse(savedData);
+  
+    if (parsedData.email) {
+      form.elements.email.value = parsedData.email;
+      formData.email = parsedData.email;
+    }
+    if (parsedData.message) {
+      form.elements.message.value = parsedData.message;
+      formData.message = parsedData.message;
+    }
   }
-}
+  
 
 form.addEventListener("submit", onFormSubmit);
 
@@ -57,8 +58,7 @@ function onFormSubmit(event) {
 
   event.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
-  formData = {
-    email: "",
-    message: "",
-  };
+  formData.email = "";
+  formData.message = "";
+
 }
